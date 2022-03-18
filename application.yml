@@ -1,0 +1,6 @@
+server:
+  port: 9099
+
+gin:
+  application:
+    name: "gin_rest_client"
