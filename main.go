@@ -172,6 +172,7 @@ func sendRequestWithFastHttp3(person dto.Person) {
 	//responseBody := string(bodyBytes())
 	//fmt.Println(fmt.Sprintf("response with statusCode %d with body %s", statusCode, responseBody))
 
+	//pkcs12.Decode()
 	if statusCode != 200 {
 		errorResponseDto := dto.ErrorResponse{}
 		err := json.Unmarshal(bodyBytes(), &errorResponseDto)

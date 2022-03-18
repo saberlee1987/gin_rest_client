@@ -7,3 +7,6 @@
 #### [FastHTTP Client](http://big-elephants.com/2016-12/fasthttp-client/)
 #### [More examples of fasthttp Client usage?](https://github.com/valyala/fasthttp/issues/599)
 #### [[go-nuts] fasthttp tls client](https://www.mail-archive.com/golang-nuts@googlegroups.com/msg39503.html)
+#### [How to read pkcs12 content in golang, i have example in PHP](https://stackoverflow.com/questions/52775864/how-to-read-pkcs12-content-in-golang-i-have-example-in-php)
+#### [pkcs12](https://pkg.go.dev/golang.org/x/crypto/pkcs12)
+#### [jwt](http://www.inanzzz.com/index.php/post/kdl9/creating-and-validating-a-jwt-rsa-token-in-golang)
