@@ -4,3 +4,21 @@ server:
 gin:
   application:
     name: "gin_rest_client"
+
+service:
+  api:
+    base-path: /services/gin-rest-client
+  person-client:
+    url: https://localhost
+    port: 9090
+    baseUrl : /services/person
+    findAll: /findAll
+    findByNationalCode: /find
+    addPerson: /add
+    updatePerson: /update
+    deletePerson: /delete
+    authorization:
+      username : 'saber66'
+      password: 'saber@123'
+
+

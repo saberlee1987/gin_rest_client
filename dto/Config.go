@@ -10,8 +10,9 @@ type Server struct {
 }
 
 type Config struct {
-	Server Server `yaml:"server" json:"server"`
-	Gin    Gin    `yaml:"gin" json:"gin"`
+	Server  Server  `yaml:"server" json:"server"`
+	Gin     Gin     `yaml:"gin" json:"gin"`
+	Service Service `yaml:"service"`
 }
 
 type Application struct {
@@ -19,6 +20,31 @@ type Application struct {
 }
 type Gin struct {
 	Application Application `yaml:"application" json:"application"`
+}
+
+type Service struct {
+	Api          Api          `yaml:"api"`
+	PersonClient PersonClient `yaml:"person-client"`
+}
+
+type Api struct {
+	BasePath string `yaml:"base-path"`
+}
+type PersonClient struct {
+	URL                string        `yaml:"url" json:"url"`
+	Port               int           `yaml:"port"`
+	Baseurl            string        `yaml:"baseUrl"`
+	FindAll            string        `yaml:"findAll"`
+	FindByNationalCode string        `yaml:"findByNationalCode"`
+	AddPerson          string        `yaml:"addPerson"`
+	UpdatePerson       string        `yaml:"updatePerson"`
+	DeletePerson       string        `yaml:"deletePerson"`
+	Authorization      Authorization `yaml:"authorization"`
+}
+
+type Authorization struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
 }
 
 func (c Config) String() string {
