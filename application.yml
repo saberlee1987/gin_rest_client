@@ -4,6 +4,10 @@ server:
 gin:
   application:
     name: "gin_rest_client"
+  consul:
+    host: localhost
+    port: 8500
+
 
 service:
   api:
@@ -17,6 +21,11 @@ service:
     addPerson: /add
     updatePerson: /update
     deletePerson: /delete
+    connection:
+      readTimeout: 30000
+      connecTionDuration: 30000
+      connectTimeout: 10000
+      connectionPerHost: 3000
     authorization:
       username : 'saber66'
       password: 'saber@123'

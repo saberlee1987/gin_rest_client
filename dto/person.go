@@ -15,15 +15,15 @@ type Person struct {
 	Mobile       string `json:"mobile,omitempty"`
 }
 type FindAllPersonResponse struct {
-	Persons []Person      `json:"persons,omitempty"`
-	Error   ErrorResponse `json:"error,omitempty"`
+	Persons *[]Person      `json:"persons,omitempty"`
+	Error   *ErrorResponse `json:"error,omitempty"`
 }
 
 type ErrorResponse struct {
-	Code            int             `json:"code,omitempty"`
-	Message         string          `json:"message,omitempty"`
-	OriginalMessage interface{}     `json:"originalMessage,omitempty"`
-	Validations     []ValidationDto `json:"validations,omitempty"`
+	Code            int              `json:"code,omitempty"`
+	Message         string           `json:"message,omitempty"`
+	OriginalMessage *interface{}     `json:"originalMessage,omitempty"`
+	Validations     *[]ValidationDto `json:"validations,omitempty"`
 }
 
 type ValidationDto struct {
@@ -32,28 +32,28 @@ type ValidationDto struct {
 }
 
 type DeletePersonResponse struct {
-	Code int    `json:"code,omitempty"`
+	Code int    `json:"code"`
 	Text string `json:"text,omitempty"`
 }
 
 type AddPersonResponseDto struct {
-	Response Person        `json:"response,omitempty"`
-	Error    ErrorResponse `json:"error,omitempty"`
+	Response *Person        `json:"response,omitempty"`
+	Error    *ErrorResponse `json:"error,omitempty"`
 }
 
 type FindPersonByNationalCodeResponseDto struct {
-	Response Person        `json:"response,omitempty"`
-	Error    ErrorResponse `json:"error,omitempty"`
+	Response *Person        `json:"response,omitempty"`
+	Error    *ErrorResponse `json:"error,omitempty"` //null
 }
 
 type UpdatePersonResponseDto struct {
-	Response Person        `json:"response,omitempty"`
-	Error    ErrorResponse `json:"error,omitempty"`
+	Response *Person        `json:"response,omitempty"`
+	Error    *ErrorResponse `json:"error,omitempty"`
 }
 
 type DeletePersonResponseDto struct {
-	Response DeletePersonResponse `json:"response,omitempty"`
-	Error    ErrorResponse        `json:"error,omitempty"`
+	Response *DeletePersonResponse `json:"response,omitempty"`
+	Error    *ErrorResponse        `json:"error,omitempty"`
 }
 
 func (response AddPersonResponseDto) String() string {
@@ -85,6 +85,17 @@ func (error ErrorResponse) String() string {
 	}
 	return string(marshal)
 }
+
+func (error DeletePersonResponse) String() string {
+
+	marshal, err := json.MarshalIndent(error, "", "\t")
+	if err != nil {
+		return fmt.Sprintf("{\"code\":\"%d\",\"text\":\"%s\"}",
+			error.Code, error.Text)
+	}
+	return string(marshal)
+}
+
 func (validationDto ValidationDto) String() string {
 	marshal, err := json.MarshalIndent(validationDto, "", "\t")
 

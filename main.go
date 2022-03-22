@@ -1,25 +1,24 @@
 package main
 
 import (
-	"crypto/tls"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
+	"gin_rest_client/config"
+	"gin_rest_client/consul"
 	"gin_rest_client/dto"
 	"gin_rest_client/services"
-	"github.com/valyala/fasthttp"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-	"net/http"
-	"time"
 )
 
 func main() {
 	fmt.Println("Hello World @@@@@")
 
+	applicationConfig := readConfigFromYamlFile()
+
+	registerConsul(applicationConfig)
+
 	//sendRequestWithHttpNet()
-	config := readConfigFromYamlFile()
 	//personUrl := personClient.URL
 	//findAllPerson()
 	//sendRequestWithFastHttp2("0079028748")
@@ -34,185 +33,47 @@ func main() {
 	//}
 	//sendRequestWithFastHttp3(person)
 
-	personClient := config.Service.PersonClient
+	personClient := applicationConfig.Service.PersonClient
+	nationalCode := "0079028748"
 
-	username := personClient.Authorization.Username
-	password := personClient.Authorization.Password
-	personUrl := personClient.URL
-	personPort := personClient.Port
-	personBaseUrl := personClient.Baseurl
-	personFindAll := personClient.FindAll
-	personFindByNationalCode := personClient.FindByNationalCode
+	person := dto.Person{
+		Firstname:    "saber",
+		Lastname:     "Azizi",
+		NationalCode: "0079028748",
+		Age:          34,
+		Email:        "saberazizi66@yahoo.com",
+		Mobile:       "09365627895",
+	}
 
-	findAllUrl := fmt.Sprintf("%s:%d%s%s", personUrl, personPort, personBaseUrl, personFindAll)
-	nationalCode := "0079028741"
-	findPersonByNationalCode := fmt.Sprintf("%s:%d%s%s/%s", personUrl, personPort, personBaseUrl, personFindByNationalCode, nationalCode)
-	findAllPersonResponse := services.FindAllPerson(findAllUrl, username, password)
-	findPersonByNationalCodeResponse := services.FindPersonByNationalCode(findPersonByNationalCode, nationalCode, username, password)
+	service := services.PersonService{}
+	service.PersonClient = personClient
 
-	fmt.Println(findAllPersonResponse)
+	//findAllPersonResponse := service.FindAllPerson()
+	//addPersonResponseDto := service.AddPerson(person)
+	//service.AddPerson(person)
+	person.Firstname = "saber66"
+	person.Lastname = "Azizi22"
+	updatePerson := service.UpdatePerson(nationalCode, person)
+	fmt.Println(updatePerson)
+	findPersonByNationalCodeResponse := service.FindPersonByNationalCode(nationalCode)
 	fmt.Println(findPersonByNationalCodeResponse)
+	//deletePerson := service.DeletePerson(nationalCode)
+	//fmt.Println(findAllPersonResponse)
+	//fmt.Println(findPersonByNationalCodeResponse)
+	//fmt.Println(addPersonResponseDto)
+	//fmt.Println(deletePerson.Response.Code)
+	//fmt.Println(deletePerson.Response.Code)
+	//fmt.Println(deletePerson)
+	//fmt.Println(addPersonResponseDto)
 
 }
 
-func sendRequestWithFastHttp2(nationalCode string) {
-
-	username := "saber66"
-	password := "saber@123"
-	authorization := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", username, password))))
-
-	url := fmt.Sprintf("https://localhost:9090/services/person/find/%s", nationalCode)
-
-	fmt.Printf("send Request with fastHttp with authorization %s \n", authorization)
-	request := fasthttp.AcquireRequest()
-	request.SetRequestURI(url)
-	//request.Header.Set("Authorization", "Basic c2FiZXI2NjpzYWJlckAxMjM=")
-	request.Header.Set("Authorization", authorization)
-	response := fasthttp.AcquireResponse()
-
-	defer fasthttp.ReleaseRequest(request)
-	defer fasthttp.ReleaseResponse(response)
-	tls := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-	client := fasthttp.Client{
-		ReadTimeout:         30 * time.Second,
-		TLSConfig:           tls,
-		MaxConnDuration:     30 * time.Second,
-		MaxConnWaitTimeout:  30 * time.Second,
-		MaxIdleConnDuration: 30 * time.Second,
-		MaxConnsPerHost:     3000,
-	}
-	err := client.Do(request, response)
-	if err != nil {
-		log.Fatal(err)
-	}
-	statusCode := response.StatusCode()
-	bodyBytes := response.Body
-	//responseBody := string(bodyBytes())
-	//fmt.Println(fmt.Sprintf("response with statusCode %d with body %s", statusCode, responseBody))
-
-	if statusCode != 200 {
-		errorResponseDto := dto.ErrorResponse{}
-		err := json.Unmarshal(bodyBytes(), &errorResponseDto)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(errorResponseDto)
-	} else {
-		person := dto.Person{}
-		err := json.Unmarshal(bodyBytes(), &person)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(person)
-
-	}
-
-}
-
-func sendRequestWithFastHttp3(person dto.Person) {
-
-	username := "saber66"
-	password := "saber@123"
-	authorization := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", username, password))))
-
-	url := "https://localhost:9090/services/person/add"
-
-	fmt.Printf("send Request with fastHttp with authorization %s \n", authorization)
-	request := fasthttp.AcquireRequest()
-	request.SetRequestURI(url)
-	request.SetBodyString(person.String())
-	//request.Header.Set("Authorization", "Basic c2FiZXI2NjpzYWJlckAxMjM=")
-	request.Header.Set("Authorization", authorization)
-	request.Header.SetContentType("application/json")
-	request.Header.SetMethod("POST")
-	response := fasthttp.AcquireResponse()
-
-	defer fasthttp.ReleaseRequest(request)
-	defer fasthttp.ReleaseResponse(response)
-	tls := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-	client := fasthttp.Client{
-		ReadTimeout:         30 * time.Second,
-		TLSConfig:           tls,
-		MaxConnDuration:     30 * time.Second,
-		MaxConnWaitTimeout:  30 * time.Second,
-		MaxIdleConnDuration: 30 * time.Second,
-		MaxConnsPerHost:     3000,
-	}
-	err := client.Do(request, response)
-	if err != nil {
-		log.Fatal(err)
-	}
-	statusCode := response.StatusCode()
-	bodyBytes := response.Body
-	//responseBody := string(bodyBytes())
-	//fmt.Println(fmt.Sprintf("response with statusCode %d with body %s", statusCode, responseBody))
-
-	//pkcs12.Decode()
-	if statusCode != 200 {
-		errorResponseDto := dto.ErrorResponse{}
-		err := json.Unmarshal(bodyBytes(), &errorResponseDto)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(errorResponseDto)
-	} else {
-		person := dto.Person{}
-		err := json.Unmarshal(bodyBytes(), &person)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(person)
-
-	}
-
-}
-
-func sendRequestWithHttpNet() {
-	tls := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-	tr := &http.Transport{
-		MaxIdleConns:        1024,
-		MaxIdleConnsPerHost: 1024,
-		IdleConnTimeout:     10 * time.Second,
-		TLSHandshakeTimeout: 10 * time.Second,
-		TLSClientConfig:     tls,
-	}
-
-	client := &http.Client{
-		Transport: tr,
-		Timeout:   30 * time.Second,
-	}
-
-	request, err := http.NewRequest("GET", "https://localhost:9090/services/person/findAll", nil)
-	request.SetBasicAuth("saber66", "saber@123")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		log.Fatal(err)
-	}
-	statusCode := response.StatusCode
-	bodyBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(fmt.Sprintf("response with statusCode %d with body %s", statusCode, string(bodyBytes)))
-}
-
-func readConfigFromYamlFile() dto.Config {
+func readConfigFromYamlFile() config.Config {
 	file, err := ioutil.ReadFile("application.yml")
 	if err != nil {
 		log.Fatal(err)
 	}
-	config := dto.Config{}
+	config := config.Config{}
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
 		log.Fatal(err)
@@ -223,4 +84,22 @@ func readConfigFromYamlFile() dto.Config {
 	fmt.Printf("Server port %d with application name is %s \n", serverPort, applicationName)
 
 	return config
+}
+
+func registerConsul(config config.Config) {
+	application := config.Gin.Application
+	c := config.Gin.Consul
+	port := config.Server.Port
+
+	client, err := consul.NewConsulClient(c.Host, c.Port)
+	if err != nil {
+		log.Println("Error for get client consul with error ====> " + err.Error())
+	}
+	err = client.Register(application.Name, port)
+	if err != nil {
+		log.Println("Error for register consul with error ====> " + err.Error())
+	} else {
+		log.Printf("%s  register successfully in consul by address http://%s:%d", application.Name, c.Host, c.Port)
+	}
+
 }
