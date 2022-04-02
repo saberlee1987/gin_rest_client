@@ -16,6 +16,13 @@ type PersonService struct {
 	PersonClient config.PersonClient
 }
 
+func GetPersonService() PersonService {
+	service := PersonService{}
+	serverConfig := config.ReadConfigFromYamlFile()
+	service.PersonClient = serverConfig.Service.PersonClient
+	return service
+}
+
 func (personService PersonService) getTlsConfig() *tls.Config {
 	return &tls.Config{
 		InsecureSkipVerify: true,
@@ -25,11 +32,11 @@ func (personService PersonService) getClient() fasthttp.Client {
 	connectionConfig := personService.PersonClient.ConnectionConfig
 
 	return fasthttp.Client{
-		ReadTimeout:         connectionConfig.ReadTimeout * time.Millisecond,
+		ReadTimeout:         time.Duration(connectionConfig.ReadTimeout) * time.Millisecond,
 		TLSConfig:           personService.getTlsConfig(),
-		MaxConnDuration:     connectionConfig.ConnectionDuration * time.Millisecond,
-		MaxConnWaitTimeout:  connectionConfig.ConnectTimeout * time.Millisecond,
-		MaxIdleConnDuration: connectionConfig.ConnectionDuration * time.Millisecond,
+		MaxConnDuration:     time.Duration(connectionConfig.ConnectionDuration) * time.Millisecond,
+		MaxConnWaitTimeout:  time.Duration(connectionConfig.ConnectTimeout) * time.Millisecond,
+		MaxIdleConnDuration: time.Duration(connectionConfig.ConnectionDuration) * time.Millisecond,
 		MaxConnsPerHost:     connectionConfig.ConnectionPerHost,
 	}
 }
@@ -39,7 +46,7 @@ func (personService PersonService) getAuthorization() string {
 	return fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", authorization.Username, authorization.Password))))
 }
 
-func (personService PersonService) FindAllPerson() dto.FindAllPersonResponse {
+func (personService PersonService) FindAllPerson() (dto.FindAllPersonResponse, int) {
 
 	authorization := personService.getAuthorization()
 	personClient := personService.PersonClient
@@ -80,10 +87,10 @@ func (personService PersonService) FindAllPerson() dto.FindAllPersonResponse {
 		}
 	}
 
-	return findAllPersonResponse
+	return findAllPersonResponse, statusCode
 }
 
-func (personService PersonService) FindPersonByNationalCode(nationalCode string) dto.FindPersonByNationalCodeResponseDto {
+func (personService PersonService) FindPersonByNationalCode(nationalCode string) (dto.FindPersonByNationalCodeResponseDto, int) {
 
 	authorization := personService.getAuthorization()
 	personClient := personService.PersonClient
@@ -122,7 +129,7 @@ func (personService PersonService) FindPersonByNationalCode(nationalCode string)
 		}
 	}
 
-	return findPersonByNationalCodeResponseDto
+	return findPersonByNationalCodeResponseDto, statusCode
 }
 
 func (personService PersonService) AddPerson(personDto dto.Person) dto.AddPersonResponseDto {

@@ -12,6 +12,10 @@ gin:
 service:
   api:
     base-path: /services/gin-rest-client
+    swagger-path: /swagger/gin-rest-client-docs/v3/api-docs/doc.json
+    swagger-title: "gin rest client"
+    swagger-version: "version1.1.0-1401/01/13"
+
   person-client:
     url: https://localhost
     port: 9090

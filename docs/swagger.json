@@ -1,0 +1,210 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "gin rest client",
+        "title": "gin rest client",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "saberazizi66@yahoo.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0-1401/01/13"
+    },
+    "host": "localhost:9099",
+    "basePath": "/service/gin-rest-client",
+    "paths": {
+        "/person/find/{nationalCode}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get the status of server.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "person api"
+                ],
+                "summary": "findPersonByNationalCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "nationalCode param",
+                        "name": "nationalCode",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FindPersonByNationalCodeResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/person/findAll": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get the status of server.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "person api"
+                ],
+                "summary": "findAllPerson",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FindAllPersonResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "originalMessage": {},
+                "validations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ValidationDto"
+                    }
+                }
+            }
+        },
+        "dto.FindAllPersonResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorResponse"
+                },
+                "persons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Person"
+                    }
+                }
+            }
+        },
+        "dto.FindPersonByNationalCodeResponseDto": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "description": "null",
+                    "$ref": "#/definitions/dto.ErrorResponse"
+                },
+                "response": {
+                    "$ref": "#/definitions/dto.Person"
+                }
+            }
+        },
+        "dto.Person": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "nationalCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ValidationDto": {
+            "type": "object",
+            "properties": {
+                "detailMessage": {
+                    "type": "string"
+                },
+                "fieldName": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

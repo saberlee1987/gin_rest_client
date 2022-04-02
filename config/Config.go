@@ -1,7 +1,10 @@
 package config
 
 import (
-	"time"
+	"fmt"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
+	"log"
 )
 
 type Server struct {
@@ -28,7 +31,10 @@ type Service struct {
 }
 
 type Api struct {
-	BasePath string `yaml:"base-path"`
+	BasePath       string `yaml:"base-path"`
+	SwaggerPath    string `yaml:"swagger-path"`
+	SwaggerTitle   string `yaml:"swagger-title"`
+	SwaggerVersion string `yaml:"swagger-version"`
 }
 type PersonClient struct {
 	URL                string           `yaml:"url"`
@@ -48,13 +54,31 @@ type Authorization struct {
 	Password string `yaml:"password"`
 }
 type ConnectionConfig struct {
-	ReadTimeout        time.Duration `yaml:"readTimeout"`
-	ConnectionDuration time.Duration `yaml:"connectionDuration"`
-	ConnectTimeout     time.Duration `yaml:"connectTimeout"`
-	ConnectionPerHost  int           `yaml:"ConnectionPerHost"`
+	ReadTimeout        int `yaml:"readTimeout"`
+	ConnectionDuration int `yaml:"connectionDuration"`
+	ConnectTimeout     int `yaml:"connectTimeout"`
+	ConnectionPerHost  int `yaml:"ConnectionPerHost"`
 }
 
 type Consul struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
+}
+
+func ReadConfigFromYamlFile() Config {
+	file, err := ioutil.ReadFile("application.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	config := Config{}
+	err = yaml.Unmarshal(file, &config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	serverPort := config.Server.Port
+	applicationName := config.Gin.Application.Name
+	fmt.Printf("Server port %d with application name is %s \n", serverPort, applicationName)
+
+	return config
 }

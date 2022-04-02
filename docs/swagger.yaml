@@ -1,0 +1,137 @@
+basePath: /service/gin-rest-client
+definitions:
+  dto.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+      originalMessage: {}
+      validations:
+        items:
+          $ref: '#/definitions/dto.ValidationDto'
+        type: array
+    type: object
+  dto.FindAllPersonResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorResponse'
+      persons:
+        items:
+          $ref: '#/definitions/dto.Person'
+        type: array
+    type: object
+  dto.FindPersonByNationalCodeResponseDto:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorResponse'
+        description: "null"
+      response:
+        $ref: '#/definitions/dto.Person'
+    type: object
+  dto.Person:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      mobile:
+        type: string
+      nationalCode:
+        type: string
+    type: object
+  dto.ValidationDto:
+    properties:
+      detailMessage:
+        type: string
+      fieldName:
+        type: string
+    type: object
+host: localhost:9099
+info:
+  contact:
+    email: saberazizi66@yahoo.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: gin rest client
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: gin rest client
+  version: 1.0.0-1401/01/13
+paths:
+  /person/find/{nationalCode}:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      parameters:
+      - description: nationalCode param
+        in: path
+        name: nationalCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.FindPersonByNationalCodeResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: findPersonByNationalCode
+      tags:
+      - person api
+  /person/findAll:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.FindAllPersonResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: findAllPerson
+      tags:
+      - person api
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
