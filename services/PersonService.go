@@ -132,7 +132,7 @@ func (personService PersonService) FindPersonByNationalCode(nationalCode string)
 	return findPersonByNationalCodeResponseDto, statusCode
 }
 
-func (personService PersonService) AddPerson(personDto dto.Person) dto.AddPersonResponseDto {
+func (personService PersonService) AddPerson(personDto dto.PersonDto) (dto.AddPersonResponseDto, int) {
 
 	authorization := personService.getAuthorization()
 	personClient := personService.PersonClient
@@ -174,10 +174,10 @@ func (personService PersonService) AddPerson(personDto dto.Person) dto.AddPerson
 			log.Fatal(err)
 		}
 	}
-	return addPersonResponse
+	return addPersonResponse, statusCode
 }
 
-func (personService PersonService) DeletePerson(nationalCode string) dto.DeletePersonResponseDto {
+func (personService PersonService) DeletePerson(nationalCode string) (dto.DeletePersonResponseDto, int) {
 
 	authorization := personService.getAuthorization()
 	personClient := personService.PersonClient
@@ -216,11 +216,11 @@ func (personService PersonService) DeletePerson(nationalCode string) dto.DeleteP
 			log.Fatal(err)
 		}
 	}
-	return deletePersonResponseDto
+	return deletePersonResponseDto, statusCode
 
 }
 
-func (personService PersonService) UpdatePerson(nationalCode string, personDto dto.Person) dto.UpdatePersonResponseDto {
+func (personService PersonService) UpdatePerson(nationalCode string, personDto dto.PersonDto) (dto.UpdatePersonResponseDto, int) {
 	authorization := personService.getAuthorization()
 	personClient := personService.PersonClient
 	url := fmt.Sprintf("%s:%d%s%s/%s", personClient.URL, personClient.Port, personClient.Baseurl, personClient.UpdatePerson, nationalCode)
@@ -260,5 +260,5 @@ func (personService PersonService) UpdatePerson(nationalCode string, personDto d
 			log.Fatal(err)
 		}
 	}
-	return updatePersonResponse
+	return updatePersonResponse, statusCode
 }

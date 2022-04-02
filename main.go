@@ -5,12 +5,15 @@ import (
 	"gin_rest_client/config"
 	"gin_rest_client/consul"
 	"gin_rest_client/docs"
+	"gin_rest_client/dto"
 	"gin_rest_client/services"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/penglongli/gin-metrics/ginmetrics"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	"log"
+	"net/http"
 )
 
 // @title gin rest client
@@ -70,9 +73,9 @@ func main() {
 	{
 		personRoute.GET("/findAll", findAllPerson(service))
 		personRoute.GET("/find/:nationalCode", findPersonByNationalCode(service))
-		//personRoute.PUT("/update/:nationalCode", updatePersonByNationalCode)
-		//personRoute.DELETE("/delete/:nationalCode", deletePersonByNationalCode)
-		//personRoute.POST("/add", addPerson)
+		personRoute.PUT("/update/:nationalCode", updatePersonByNationalCode(service))
+		personRoute.DELETE("/delete/:nationalCode", deletePersonByNationalCode(service))
+		personRoute.POST("/add", addPerson(service))
 	}
 
 	router.Run(fmt.Sprintf(":%d", server.Port))
@@ -96,9 +99,9 @@ func CORSMiddleware() gin.HandlerFunc {
 
 // HealthCheck godoc
 // @Summary findAllPerson
-// @Description get the status of server.
-// @Tags person api
-// @Accept */*
+// @Description findAllPerson
+// @Tags gin rest client
+// @Accept application/json
 // @Produce json
 // @Success 200 {object}  dto.FindAllPersonResponse
 // @Router /person/findAll [get]
@@ -121,9 +124,9 @@ func findAllPerson(service services.PersonService) gin.HandlerFunc {
 
 // HealthCheck godoc
 // @Summary findPersonByNationalCode
-// @Description get the status of server.
-// @Tags person api
-// @Accept */*
+// @Description findPersonByNationalCode
+// @Tags gin rest client
+// @Accept application/json
 // @Param nationalCode path string true "nationalCode param"
 // @Produce json
 // @Success 200 {object}  dto.FindPersonByNationalCodeResponseDto
@@ -137,6 +140,127 @@ func findPersonByNationalCode(service services.PersonService) gin.HandlerFunc {
 	fn := func(context *gin.Context) {
 		nationalCode := context.Param("nationalCode")
 		response, statusCode := service.FindPersonByNationalCode(nationalCode)
+		if statusCode != 200 {
+			errorResponse := response.Error
+			context.JSON(statusCode, errorResponse)
+		} else {
+			context.JSON(statusCode, response)
+		}
+	}
+	return fn
+}
+
+// HealthCheck godoc
+// @Summary deletePersonByNationalCode
+// @Description deletePersonByNationalCode
+// @Tags gin rest client
+// @Accept application/json
+// @Param nationalCode path string true "nationalCode param"
+// @Produce json
+// @Success 200 {object}  dto.DeletePersonResponseDto
+// @Failure 400,404,406,500,504 {object} dto.ErrorResponse
+// @Router /person/delete/{nationalCode} [delete]
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @Security ApiKeyAuth
+func deletePersonByNationalCode(service services.PersonService) gin.HandlerFunc {
+	fn := func(context *gin.Context) {
+		nationalCode := context.Param("nationalCode")
+		response, statusCode := service.DeletePerson(nationalCode)
+		if statusCode != 200 {
+			errorResponse := response.Error
+			context.JSON(statusCode, errorResponse)
+		} else {
+			context.JSON(statusCode, response)
+		}
+	}
+	return fn
+}
+
+// HealthCheck godoc
+// @Summary update person by nationalCode
+// @Description update person by nationalCode.
+// @Tags gin rest client
+// @Accept application/json
+// @Param nationalCode path string true "nationalCode param"
+//@Param personDto body dto.PersonDto true "person body"
+// @Produce json
+// @Success 200 {object}  dto.UpdatePersonResponseDto
+// @Failure 400,404,406,500,504 {object} dto.ErrorResponse
+// @Router /person/update/{nationalCode} [put]
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @Security ApiKeyAuth
+func updatePersonByNationalCode(service services.PersonService) gin.HandlerFunc {
+	fn := func(context *gin.Context) {
+		nationalCode := context.Param("nationalCode")
+
+		var person dto.PersonDto
+		err := context.ShouldBindJSON(&person)
+		if err != nil {
+			var errorResponseDto dto.ErrorResponse
+			errorResponseDto.Code = -1
+			errorResponseDto.Message = "BadRequest"
+			var validations []dto.ValidationDto
+			for _, fieldErr := range err.(validator.ValidationErrors) {
+				validation := dto.ValidationDto{}
+				validation.FieldName = fieldErr.Field()
+				validation.DetailMessage = fmt.Sprintf("Error for %s actual value %s is %s your input %v", fieldErr.StructField(), fieldErr.ActualTag(), fieldErr.Param(), fieldErr.Value())
+				validations = append(validations, validation)
+			}
+			errorResponseDto.Validations = &validations
+			fmt.Printf("Error for binding json to person with error %s\n", errorResponseDto)
+			context.JSON(http.StatusBadRequest, errorResponseDto)
+			return
+		}
+		response, statusCode := service.UpdatePerson(nationalCode, person)
+		if statusCode != 200 {
+			errorResponse := response.Error
+			context.JSON(statusCode, errorResponse)
+		} else {
+			context.JSON(statusCode, response)
+		}
+	}
+	return fn
+}
+
+// HealthCheck godoc
+// @Summary add person
+// @Description add person.
+// @Tags gin rest client
+// @Accept application/json
+//@Param personDto body dto.PersonDto true "person body"
+// @Produce json
+// @Success 200 {object}  dto.AddPersonResponseDto
+// @Failure 400,404,406,500,504 {object} dto.ErrorResponse
+// @Router /person/add [post]
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @Security ApiKeyAuth
+func addPerson(service services.PersonService) gin.HandlerFunc {
+	fn := func(context *gin.Context) {
+		var person dto.PersonDto
+		err := context.ShouldBindJSON(&person)
+		if err != nil {
+			var errorResponseDto dto.ErrorResponse
+			errorResponseDto.Code = -1
+			errorResponseDto.Message = "BadRequest"
+			var validations []dto.ValidationDto
+			for _, fieldErr := range err.(validator.ValidationErrors) {
+				validation := dto.ValidationDto{}
+				validation.FieldName = fieldErr.Field()
+				validation.DetailMessage = fmt.Sprintf("Error for %s actual value %s is %s your input %v", fieldErr.StructField(), fieldErr.ActualTag(), fieldErr.Param(), fieldErr.Value())
+				validations = append(validations, validation)
+			}
+			errorResponseDto.Validations = &validations
+			fmt.Printf("Error for binding json to person with error %s\n", errorResponseDto)
+			context.JSON(http.StatusBadRequest, errorResponseDto)
+			return
+		}
+		response, statusCode := service.AddPerson(person)
 		if statusCode != 200 {
 			errorResponse := response.Error
 			context.JSON(statusCode, errorResponse)

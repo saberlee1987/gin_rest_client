@@ -8,11 +8,20 @@ import (
 type Person struct {
 	Id           int    `json:"id,omitempty"`
 	Firstname    string `json:"firstname,omitempty"`
-	Lastname     string `json:"lastname,omitempty"`
-	NationalCode string `json:"nationalCode,omitempty"`
-	Age          int    `json:"age,omitempty"`
+	Lastname     string `json:"lastname,omitempty" `
+	NationalCode string `json:"nationalCode,omitempty" `
+	Age          int    `json:"age,omitempty" `
 	Email        string `json:"email,omitempty"`
 	Mobile       string `json:"mobile,omitempty"`
+}
+
+type PersonDto struct {
+	Firstname    string `json:"firstname,omitempty" binding:"required" example:"saber"`
+	Lastname     string `json:"lastname,omitempty" binding:"required" example:"azizi"`
+	NationalCode string `json:"nationalCode,omitempty" binding:"required,min=10,max=10" example:"0079028748"`
+	Age          int    `json:"age,omitempty" binding:"required" example:"35"`
+	Email        string `json:"email,omitempty"  binding:"required,email" example:"saberazizi66@yahoo.com"`
+	Mobile       string `json:"mobile,omitempty" binding:"required" example:"09365627895"`
 }
 type FindAllPersonResponse struct {
 	Persons *[]Person      `json:"persons,omitempty"`
@@ -69,6 +78,15 @@ func (person Person) String() string {
 	marshal, err := json.MarshalIndent(person, "", "\t")
 	if err != nil {
 		return fmt.Sprintf("{\"id\":%d,\"firstName\":\"%s\",\"lastName\":\"%s\",\"nationalCode\":\"%s\",\"age\":%d,\"email\":\"%s\",\"mobile\":\"%s\"}", person.Id,
+			person.Firstname, person.Lastname, person.NationalCode, person.Age, person.Email, person.Mobile)
+	}
+	return string(marshal)
+}
+func (person PersonDto) String() string {
+
+	marshal, err := json.MarshalIndent(person, "", "\t")
+	if err != nil {
+		return fmt.Sprintf("{\"firstName\":\"%s\",\"lastName\":\"%s\",\"nationalCode\":\"%s\",\"age\":%d,\"email\":\"%s\",\"mobile\":\"%s\"}",
 			person.Firstname, person.Lastname, person.NationalCode, person.Age, person.Email, person.Mobile)
 	}
 	return string(marshal)

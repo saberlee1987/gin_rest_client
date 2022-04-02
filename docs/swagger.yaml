@@ -1,5 +1,26 @@
 basePath: /service/gin-rest-client
 definitions:
+  dto.AddPersonResponseDto:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorResponse'
+      response:
+        $ref: '#/definitions/dto.Person'
+    type: object
+  dto.DeletePersonResponse:
+    properties:
+      code:
+        type: integer
+      text:
+        type: string
+    type: object
+  dto.DeletePersonResponseDto:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorResponse'
+      response:
+        $ref: '#/definitions/dto.DeletePersonResponse'
+    type: object
   dto.ErrorResponse:
     properties:
       code:
@@ -46,6 +67,43 @@ definitions:
       nationalCode:
         type: string
     type: object
+  dto.PersonDto:
+    properties:
+      age:
+        example: 35
+        type: integer
+      email:
+        example: saberazizi66@yahoo.com
+        type: string
+      firstname:
+        example: saber
+        type: string
+      lastname:
+        example: azizi
+        type: string
+      mobile:
+        example: "09365627895"
+        type: string
+      nationalCode:
+        example: "0079028748"
+        maxLength: 10
+        minLength: 10
+        type: string
+    required:
+    - age
+    - email
+    - firstname
+    - lastname
+    - mobile
+    - nationalCode
+    type: object
+  dto.UpdatePersonResponseDto:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorResponse'
+      response:
+        $ref: '#/definitions/dto.Person'
+    type: object
   dto.ValidationDto:
     properties:
       detailMessage:
@@ -67,11 +125,98 @@ info:
   title: gin rest client
   version: 1.0.0-1401/01/13
 paths:
+  /person/add:
+    post:
+      consumes:
+      - application/json
+      description: add person.
+      parameters:
+      - description: person body
+        in: body
+        name: personDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PersonDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AddPersonResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: add person
+      tags:
+      - gin rest client
+  /person/delete/{nationalCode}:
+    delete:
+      consumes:
+      - application/json
+      description: deletePersonByNationalCode
+      parameters:
+      - description: nationalCode param
+        in: path
+        name: nationalCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DeletePersonResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: deletePersonByNationalCode
+      tags:
+      - gin rest client
   /person/find/{nationalCode}:
     get:
       consumes:
-      - '*/*'
-      description: get the status of server.
+      - application/json
+      description: findPersonByNationalCode
       parameters:
       - description: nationalCode param
         in: path
@@ -109,12 +254,12 @@ paths:
       - ApiKeyAuth: []
       summary: findPersonByNationalCode
       tags:
-      - person api
+      - gin rest client
   /person/findAll:
     get:
       consumes:
-      - '*/*'
-      description: get the status of server.
+      - application/json
+      description: findAllPerson
       produces:
       - application/json
       responses:
@@ -126,7 +271,56 @@ paths:
       - ApiKeyAuth: []
       summary: findAllPerson
       tags:
-      - person api
+      - gin rest client
+  /person/update/{nationalCode}:
+    put:
+      consumes:
+      - application/json
+      description: update person by nationalCode.
+      parameters:
+      - description: nationalCode param
+        in: path
+        name: nationalCode
+        required: true
+        type: string
+      - description: person body
+        in: body
+        name: personDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PersonDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpdatePersonResponseDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "406":
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: update person by nationalCode
+      tags:
+      - gin rest client
 schemes:
 - http
 securityDefinitions:

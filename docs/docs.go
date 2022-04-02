@@ -25,6 +25,142 @@ const docTemplate_swagger = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/person/add": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "add person.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gin rest client"
+                ],
+                "summary": "add person",
+                "parameters": [
+                    {
+                        "description": "person body",
+                        "name": "personDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PersonDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddPersonResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/person/delete/{nationalCode}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "deletePersonByNationalCode",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gin rest client"
+                ],
+                "summary": "deletePersonByNationalCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "nationalCode param",
+                        "name": "nationalCode",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeletePersonResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/person/find/{nationalCode}": {
             "get": {
                 "security": [
@@ -32,15 +168,15 @@ const docTemplate_swagger = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get the status of server.",
+                "description": "findPersonByNationalCode",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "person api"
+                    "gin rest client"
                 ],
                 "summary": "findPersonByNationalCode",
                 "parameters": [
@@ -99,15 +235,15 @@ const docTemplate_swagger = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get the status of server.",
+                "description": "findAllPerson",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "person api"
+                    "gin rest client"
                 ],
                 "summary": "findAllPerson",
                 "responses": {
@@ -119,9 +255,118 @@ const docTemplate_swagger = `{
                     }
                 }
             }
+        },
+        "/person/update/{nationalCode}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update person by nationalCode.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gin rest client"
+                ],
+                "summary": "update person by nationalCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "nationalCode param",
+                        "name": "nationalCode",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "person body",
+                        "name": "personDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PersonDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdatePersonResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "dto.AddPersonResponseDto": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorResponse"
+                },
+                "response": {
+                    "$ref": "#/definitions/dto.Person"
+                }
+            }
+        },
+        "dto.DeletePersonResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeletePersonResponseDto": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorResponse"
+                },
+                "response": {
+                    "$ref": "#/definitions/dto.DeletePersonResponse"
+                }
+            }
+        },
         "dto.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -189,6 +434,56 @@ const docTemplate_swagger = `{
                 },
                 "nationalCode": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.PersonDto": {
+            "type": "object",
+            "required": [
+                "age",
+                "email",
+                "firstname",
+                "lastname",
+                "mobile",
+                "nationalCode"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer",
+                    "example": 35
+                },
+                "email": {
+                    "type": "string",
+                    "example": "saberazizi66@yahoo.com"
+                },
+                "firstname": {
+                    "type": "string",
+                    "example": "saber"
+                },
+                "lastname": {
+                    "type": "string",
+                    "example": "azizi"
+                },
+                "mobile": {
+                    "type": "string",
+                    "example": "09365627895"
+                },
+                "nationalCode": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10,
+                    "example": "0079028748"
+                }
+            }
+        },
+        "dto.UpdatePersonResponseDto": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorResponse"
+                },
+                "response": {
+                    "$ref": "#/definitions/dto.Person"
                 }
             }
         },
